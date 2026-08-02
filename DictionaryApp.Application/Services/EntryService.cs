@@ -22,9 +22,26 @@ public class EntryService(IEntryRepository entryRepository) : IEntryService
 
     public async Task CreateEntries(IEnumerable<CreateEntryDto> entryDtos)
     {
-        foreach (var requestEntryDto in entryDtos)
+        foreach (var entryDto in entryDtos)
         {
-            await entryRepository.CreateEntry(requestEntryDto);
+            var foundWord = await entryRepository.GetEntry(entryDto.Word.Trim());
+            if (foundWord == null)
+            {
+                await entryRepository.CreateEntry(entryDto);
+            }
+            else
+            {
+                var translates = foundWord.Translate.ToList();
+                translates.AddRange(entryDto.Translate);
+                foundWord.Translate = translates.Select(x => x.Trim())
+                    .Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+                await entryRepository.UpdateEntry(new EntryDto()
+                {
+                    Id = foundWord.Id,
+                    Word = foundWord.Word,
+                    Translate = foundWord.Translate
+                });
+            }
         }
     }
 
