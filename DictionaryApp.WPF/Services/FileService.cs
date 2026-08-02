@@ -1,21 +1,22 @@
 ﻿using System.IO;
 using System.Text.Json;
-using System.Windows;
 using DictionaryApp.Application.Dtos;
 using DictionaryApp.Application.Mappings;
 using DictionaryApp.Domain.Models;
+using DictionaryApp.Infrastructure.Data;
 using DictionaryApp.WPF.Extensions;
 using DictionaryApp.WPF.Interfaces.Services;
+//using Microsoft.Win32;
 
 namespace DictionaryApp.WPF.Services;
 
-public class FileService : IFileService
+public class FileService(IMessageService messageService) : IFileService
 {
     public IEnumerable<EntryDto> ImportTxt()
     {
         try
         {
-            var filePath = AppExtensions.GetFilePath(FileFilter.Txt);
+            var filePath = FileFilter.Txt.GetFileDialogPath();
             if(string.IsNullOrEmpty(filePath)) return new List<EntryDto>();
             var lines = File.ReadAllLines(filePath);
             var words = new List<EntryDto>();
@@ -32,7 +33,7 @@ public class FileService : IFileService
         }
         catch (Exception e)
         {
-            MessageBox.Show(e.Message, "Import txt error");
+            messageService.Error(e, "Import txt error");
             return new List<EntryDto>();
         }
     }
@@ -41,7 +42,7 @@ public class FileService : IFileService
     {
         try
         {
-            var filePath = AppExtensions.GetFilePath(FileFilter.Json);
+            var filePath = FileFilter.Json.GetFileDialogPath();
             if(string.IsNullOrEmpty(filePath)) return new List<EntryDto>();
             var jsonData = File.ReadAllText(filePath);
             return string.IsNullOrEmpty(jsonData) 
@@ -50,10 +51,20 @@ public class FileService : IFileService
         }
         catch (Exception e)
         {
-            MessageBox.Show(e.Message, "Import json error");
+            messageService.Error(e, "Import json error");
             return new List<EntryDto>();
         }
     }
 
-    public void ExportJson() => AppExtensions.ExportJsonFile();
+    public void ExportJson()
+    {
+        try
+        {
+            AppExtensions.ExportToJson();
+        }
+        catch (Exception ex)
+        {
+            messageService.Error(ex, "Error saving file");
+        }
+    }
 }
