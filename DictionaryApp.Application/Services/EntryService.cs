@@ -11,7 +11,7 @@ public class EntryService(IEntryRepository entryRepository) : IEntryService
         var entries = string.IsNullOrWhiteSpace(search)
             ? await entryRepository.GetEntries()
             : await entryRepository.GetEntries(search);
-        return entries.Select(x => x.ToDto());
+        return entries.Select(x => x.ToDto()!);
     }
 
     public async Task<EntryDto?> GetEntry(string word)
@@ -48,7 +48,7 @@ public class EntryService(IEntryRepository entryRepository) : IEntryService
     public async Task<EntryDto> CreateEntry(CreateEntryDto entryDto)
     {
         var createdEntry = await entryRepository.CreateEntry(entryDto);
-        return createdEntry.ToDto();
+        return createdEntry.ToDto()!;
     }
 
     public async Task DeleteEntry(int entryId)

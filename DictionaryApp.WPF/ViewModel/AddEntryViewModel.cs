@@ -15,11 +15,15 @@ public class AddEntryViewModel : ObservableObject, IEntryModelObject, IInitingOb
     private readonly IFileService _fileService;
     private readonly EntryApi _entryApi;
 
-    public AddEntryViewModel(INavigationService navigationService, IFileService fileService, IEntryService entryService)
+    public AddEntryViewModel(
+        INavigationService navigationService,
+        IFileService fileService,
+        IEntryService entryService,
+        IMessageService messageService)
     {
         _navigationService = navigationService;
         _fileService = fileService;
-        _entryApi = new EntryApi(entryService);
+        _entryApi = new EntryApi(entryService, messageService);
         CmdGoWords = new AsyncRelayCommand(async () => await _navigationService.NavigateTo<WordsViewModel>());
         CmdAddWord = new AsyncRelayCommand(async () => await AddWordHandler());
         CmdImportTxt = new AsyncRelayCommand(async () => await ImportTxtHandler());

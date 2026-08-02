@@ -6,9 +6,9 @@ namespace DictionaryApp.Application.Mappings;
 
 public static class MappingsExtension
 {
-    public static EntryDto ToDto(this Entry? entry)
+    public static EntryDto? ToDto(this Entry? entry)
     {
-        if (entry == null) throw new NotFoundException("Entry is null");
+        if (entry == null) return null;
         return new EntryDto
         {
             Id = entry.Id,

@@ -46,7 +46,7 @@ public class FileService : IFileService
             var jsonData = File.ReadAllText(filePath);
             return string.IsNullOrEmpty(jsonData) 
                 ? [] 
-                : JsonSerializer.Deserialize<IEnumerable<Entry>>(jsonData)!.Select(x => x.ToDto());
+                : JsonSerializer.Deserialize<IEnumerable<Entry>>(jsonData)!.Select(x => x.ToDto()!);
         }
         catch (Exception e)
         {

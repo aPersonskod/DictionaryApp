@@ -14,10 +14,13 @@ public class UpdateEntryViewModel : ObservableObject, IEntryModelObject, IInitin
     private readonly INavigationService _navigationService;
     private readonly EntryApi _entryApi;
 
-    public UpdateEntryViewModel(INavigationService navigationService, IEntryService entryService)
+    public UpdateEntryViewModel(
+        INavigationService navigationService,
+        IEntryService entryService,
+        IMessageService messageService)
     {
         _navigationService = navigationService;
-        _entryApi = new EntryApi(entryService);
+        _entryApi = new EntryApi(entryService, messageService);
         CmdGoWords = new AsyncRelayCommand(async () => await GoWordsHandler());
         CmdUpdateWord = new AsyncRelayCommand(async () => await UpdateWordHandler());
     }

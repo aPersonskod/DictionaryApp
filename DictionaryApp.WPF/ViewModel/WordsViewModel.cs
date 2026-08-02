@@ -17,11 +17,15 @@ public class WordsViewModel : ObservableObject, IInitingObject
     private readonly EntryApi _entryApi;
     private readonly IFileService _fileService;
 
-    public WordsViewModel(INavigationService navigationService, IFileService fileService, IEntryService entryService)
+    public WordsViewModel(
+        INavigationService navigationService,
+        IFileService fileService,
+        IEntryService entryService,
+        IMessageService messageService)
     {
         _navigationService = navigationService;
         _fileService = fileService;
-        _entryApi = new EntryApi(entryService);
+        _entryApi = new EntryApi(entryService, messageService);
         CmdGoAddWord = new AsyncRelayCommand(async () =>
         {
             if (!string.IsNullOrWhiteSpace(SearchText))
