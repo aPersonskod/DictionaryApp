@@ -1,0 +1,88 @@
+<UserControl x:Class="DictionaryDesktopApp.View.WordsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:DictionaryDesktopApp.View"
+             xmlns:viewModel="clr-namespace:DictionaryApp.WPF.ViewModel"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance viewModel:WordsViewModel}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ResourceDictionary/Icons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="SearchTextBox" Grid.Column="0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding CmdGoAddWord}" />
+                    <KeyBinding Key="Escape" Command="{Binding CmdClearSearch}" />
+                </TextBox.InputBindings>
+            </TextBox>
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="X" Command="{Binding CmdClearSearch}"/>
+            <Button Grid.Column="1" Content="Search" Command="{Binding CmdSearch}"/>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
+            <DataGrid AutoGenerateColumns="False" IsReadOnly="True" CanUserDeleteRows="False" CanUserAddRows="False" 
+                      ItemsSource="{Binding FoundEntries}" SelectedItem="{Binding SelectedEntry}">
+                <DataGrid.InputBindings>
+                    <MouseBinding
+                        MouseAction="LeftDoubleClick"
+                        Command="{Binding CmdGoUpdateWord}"/>
+                </DataGrid.InputBindings>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Word" Width="*" Binding="{Binding Word}"/>
+                    <DataGridTemplateColumn Header="Translate" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ListBox ItemsSource="{Binding Translate}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Width="Auto">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Background="Red" Content="Remove" 
+                                        Command="{Binding DataContext.CmdDeleteWord, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Add word" Command="{Binding CmdGoAddWord}"/>
+            <TextBlock Grid.Column="1" Margin="2 0 0 0" Text="{Binding EntriesCountText}"/>
+            <Button Grid.Column="2" Command="{Binding CmdExportToJson}" ToolTip="Export data to Json file">
+                <Viewbox>
+                    <Path Data="{StaticResource ExportIcon}" 
+                          Fill="Black" 
+                          Stretch="Uniform" />
+                </Viewbox>
+            </Button>
+        </Grid>
+    </Grid>
+</UserControl>
