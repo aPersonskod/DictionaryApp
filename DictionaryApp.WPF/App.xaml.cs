@@ -34,7 +34,6 @@ public partial class App : System.Windows.Application
         services.AddScoped<INavigationService, NavigationService>();
         services.AddScoped<IFileService, FileService>();
         services.AddTransient<IMessageService, MessageService>();
-        services.AddScoped<AppDbContext>();
         _serviceProvider = services.BuildServiceProvider();
     }
 

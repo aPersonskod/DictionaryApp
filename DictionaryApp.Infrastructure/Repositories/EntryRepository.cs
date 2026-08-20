@@ -6,54 +6,69 @@ using DictionaryApp.Infrastructure.Data;
 
 namespace DictionaryApp.Infrastructure.Repositories;
 
-public class EntryRepository(AppDbContext context) : IEntryRepository
+public class EntryRepository : IEntryRepository
 {
-    public Task<IEnumerable<Entry>> GetEntries() 
-        => Task.FromResult<IEnumerable<Entry>>(context.Entries);
-    
-    public Task<IEnumerable<Entry>> GetEntries(string search)
+    private readonly JsonSet<Entry> _entrySet;
+
+    public EntryRepository()
+    {
+        var jsonPath = Path.Combine(AppConfig.RoamingPath, AppConfig.JsonFileName);
+        _entrySet = new JsonSet<Entry>(jsonPath);
+    }
+
+    public async Task<IEnumerable<Entry>> GetEntries()
+    {
+        var allEntries = await _entrySet.GetDataAsync();
+        return allEntries.OrderBy(e => e.Word);
+    }
+
+    public async Task<IEnumerable<Entry>> GetEntries(string search)
     {
         var trimSearch = search.Trim().ToLower();
-        var entries = context.Entries.Where(x =>
+        var allEntries = await _entrySet.GetDataAsync();
+        var entries = allEntries.Where(x =>
         {
             var wordEquality = x.Word.Contains(trimSearch, StringComparison.OrdinalIgnoreCase);
             var translateEquality = x.Translate.Any(t => t.Contains(trimSearch, StringComparison.OrdinalIgnoreCase));
             return wordEquality || translateEquality;
         });
-        return Task.FromResult(entries);
+        return entries;
     }
 
-    public Task<Entry?> GetEntry(string word)
+    public async Task<Entry?> GetEntry(string word)
     {
         var trimWord = word.Trim().ToLower();
-        var foundEntry = context.Entries.FirstOrDefault(x =>
+        var allEntries = await _entrySet.GetDataAsync();
+        var foundEntry = allEntries.FirstOrDefault(x =>
         {
             var wordEquality = x.Word.Equals(trimWord, StringComparison.OrdinalIgnoreCase);
             var translateEquality = x.Translate.Any(t => t.Equals(trimWord, StringComparison.OrdinalIgnoreCase));
             return wordEquality || translateEquality;
         });
-        return Task.FromResult(foundEntry);
+        return foundEntry;
     }
 
     public async Task<Entry> CreateEntry(CreateEntryDto entryDto)
     {
-        var entries = await GetEntries("");
-        var entriesList = entries.ToList();
-        var newId = entriesList.Count == 0 ? 1 : entriesList.Max(x => x.Id) + 1;
+        var allEntries = await _entrySet.GetDataAsync();
+        var entries = allEntries.ToList();
+        var newId = entries.Count == 0 ? 1 : entries.Max(x => x.Id) + 1;
         var createdEntry = new Entry()
         {
             Id = newId,
             Word = entryDto.Word,
             Translate = entryDto.Translate
         };
-        context.Entries.Add(createdEntry);
+        entries.Add(createdEntry);
+        await _entrySet.SetDataAsync(entries);
         return createdEntry;
     }
 
-    public Task<Entry> UpdateEntry(EntryDto entryDto)
+    public async Task<Entry> UpdateEntry(EntryDto entryDto)
     {
-        var allEntries = context.Entries.ToList();
-        var foundEntryIndex = allEntries.FindIndex(x => x.Id == entryDto.Id);
+        var allEntries = await _entrySet.GetDataAsync();
+        var entries = allEntries.ToList();
+        var foundEntryIndex = entries.FindIndex(x => x.Id == entryDto.Id);
         if (foundEntryIndex == -1) throw new NotFoundException("Entry not found");
         var updatedEntry = new Entry()
         {
@@ -61,16 +76,18 @@ public class EntryRepository(AppDbContext context) : IEntryRepository
             Word = entryDto.Word,
             Translate = entryDto.Translate
         };
-        context.Entries[foundEntryIndex] = updatedEntry;
-        return Task.FromResult(updatedEntry);
+        entries[foundEntryIndex] = updatedEntry;
+        await _entrySet.SetDataAsync(entries);
+        return updatedEntry;
     }
 
-    public Task DeleteEntry(int id)
+    public async Task DeleteEntry(int id)
     {
-        var allEntries = context.Entries.ToList();
-        var foundEntryIndex = allEntries.FindIndex(x => x.Id == id);
+        var allEntries = await _entrySet.GetDataAsync();
+        var entries = allEntries.ToList();
+        var foundEntryIndex = entries.FindIndex(x => x.Id == id);
         if (foundEntryIndex == -1) throw new NotFoundException("Entry not found");
-        context.Entries.RemoveAt(foundEntryIndex);
-        return Task.CompletedTask;
+        entries.RemoveAt(foundEntryIndex);
+        await _entrySet.SetDataAsync(entries);
     }
 }

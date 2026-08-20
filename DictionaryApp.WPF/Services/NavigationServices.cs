@@ -22,6 +22,7 @@ public class NavigationService(IServiceProvider serviceProvider) : INavigationSe
         if (vm is IInitingObject initingObject) await initingObject.InitAsync();
         foreach (var parameter in parameters)
         {
+            if (parameter is null) return;
             switch (vm)
             {
                 case IEntryModelObject wordModelObject:
