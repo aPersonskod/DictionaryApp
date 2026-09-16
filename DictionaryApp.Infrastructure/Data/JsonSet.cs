@@ -21,7 +21,7 @@ public class JsonSet<T>(string jsonPath)
 
     public async Task SetDataAsync(IEnumerable<T> data)
     {
-        await using var jsonStream = new FileStream(jsonPath, FileMode.OpenOrCreate, FileAccess.Write);
+        await using var jsonStream = new FileStream(jsonPath, FileMode.Create, FileAccess.Write);
         await JsonSerializer.SerializeAsync(jsonStream, data, _jsonSerializerOptions);
     }
 }

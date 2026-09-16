@@ -62,7 +62,7 @@ public class UpdateEntryViewModel : ObservableObject, IEntryModelObject, IInitin
 
     public EntryDto Entry { get; } = new EntryDto();
 
-    public void SetWord(EntryDto entry)
+    public async Task SetWord(EntryDto entry)
     {
         Entry.Id = entry.Id;
         WordText = entry.Word;

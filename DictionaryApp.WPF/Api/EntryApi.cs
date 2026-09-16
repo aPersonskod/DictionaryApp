@@ -79,4 +79,10 @@ public class EntryApi(IEntryService entryService, IMessageService messageService
             messageService.Error(e, "CreateEntry error");
         }
     }
+
+    public async Task<string> Translate(string word)
+    {
+        var filePath = @"C:\Users\Andrew\Desktop\zaz.html";
+        return filePath;
+    }
 }

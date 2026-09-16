@@ -73,8 +73,8 @@ public class EntryRepository : IEntryRepository
         var updatedEntry = new Entry()
         {
             Id = entryDto.Id,
-            Word = entryDto.Word,
-            Translate = entryDto.Translate
+            Word = entryDto.Word.ToLower(),
+            Translate = entryDto.Translate.Select(x => x.ToLower()).ToArray()
         };
         entries[foundEntryIndex] = updatedEntry;
         await _entrySet.SetDataAsync(entries);

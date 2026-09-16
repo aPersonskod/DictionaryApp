@@ -37,8 +37,8 @@ public class AddEntryViewModel : ObservableObject, IEntryModelObject, IInitingOb
         if(string.IsNullOrEmpty(EntryWord) || string.IsNullOrWhiteSpace(EntryTranslate)) return;
         var createEntryDto = new CreateEntryDto()
         {
-            Word = Entry.Word,
-            Translate = Entry.Translate
+            Word = Entry.Word.ToLower(),
+            Translate = Entry.Translate.Select(x => x.ToLower()).ToArray()
         };
         await _entryApi.CreateEntryAsync(createEntryDto);
         CmdGoWords.Execute(null);
@@ -88,9 +88,10 @@ public class AddEntryViewModel : ObservableObject, IEntryModelObject, IInitingOb
         }
     }
     
-    public void SetWord(EntryDto entry)
+    public async Task SetWord(EntryDto entry)
     {
         EntryWord = entry.Word;
+        EntryTranslate = string.Join(',', entry.Translate);
     }
 
     public Task InitAsync()

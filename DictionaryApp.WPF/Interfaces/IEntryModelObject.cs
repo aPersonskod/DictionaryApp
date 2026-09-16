@@ -5,5 +5,5 @@ namespace DictionaryApp.WPF.Interfaces;
 public interface IEntryModelObject
 {
     EntryDto Entry { get; }
-    void SetWord(EntryDto entry);
+    Task SetWord(EntryDto entry);
 }

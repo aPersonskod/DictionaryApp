@@ -16,15 +16,18 @@ public class WordsViewModel : ObservableObject, IInitingObject
     private readonly INavigationService _navigationService;
     private readonly EntryApi _entryApi;
     private readonly IFileService _fileService;
+    private readonly ITranslateService _translateService;
 
     public WordsViewModel(
         INavigationService navigationService,
         IFileService fileService,
         IEntryService entryService,
+        ITranslateService translateService,
         IMessageService messageService)
     {
         _navigationService = navigationService;
         _fileService = fileService;
+        _translateService = translateService;
         _entryApi = new EntryApi(entryService, messageService);
         CmdGoAddWord = new AsyncRelayCommand(async () =>
         {
@@ -36,9 +39,11 @@ public class WordsViewModel : ObservableObject, IInitingObject
                     await _navigationService.NavigateTo<UpdateEntryViewModel>([foundWord]);
                     return;
                 }
+                var translatedWord = await _translateService.GetTranslations(SearchText);
                 var wordModel = new EntryDto()
                 {
-                    Word = SearchText
+                    Word = SearchText,
+                    Translate = [translatedWord]
                 };
                 await _navigationService.NavigateTo<AddEntryViewModel>([wordModel]);
                 return;
